@@ -2,9 +2,9 @@ clear;
 addpath /data/local/myFunctions/
 
 % SETTINGS
-quantify   = 1; % This will make a line plot for all layers instead of barplots for each
+quantify   = 1; % This will make a line plot for all layers instead of barplots for each (quantify=1 gives you the last figure from the paper)
 cortype    = 'Pearson'; % to correlate means of barplots for each layer with mean of neural/human data
-choice     = 'alexnet'; dim1 = 4; % set dim1 to 4 for alexnet and 5 for vgg
+choice     = 'vgg16'; dim1 = 5; % set dim1 to 4 for alexnet and 5 for vgg
 stimchoice = 'regularIrregular';
 
 % Setting the layer names depending on the network chosen.
@@ -67,9 +67,6 @@ for hum1_nrn2 = 1:2             % human = 1, neural = 2
             % To compare with the human data, the last two groups (ISC_ISS) are
             % averaged into one, to M matrix has to be 8x5 instead of 8x6 as
             % the neural data comparison.
-            % RUN THE OUTERMOST FOR LOOP WITH hum1_nrn2 = 1 AND WITHOUT
-            % CLEARING DATA RUN IT AGAIN FOR hum1_nrn2 = 2
-
             % -----------------------------------------------------------
             % for human data, we have 5 groups. The 5th group is the last
             % two groups, averaged into one
@@ -108,44 +105,38 @@ for hum1_nrn2 = 1:2             % human = 1, neural = 2
                     if qq == numel(layer)
                         saveas(gcf,['/home/luna.kuleuven.be/u0107087/Desktop/' network '_human.bmp'])
                     end
+                end
 
                 % -----------------------------------------------------------
                 % for neural data, we have 6 groups
-                elseif hum1_nrn2 == 2
-                    groupnames = {'R','IC','ISC','ISS','ISCa\_ISSa','ISCb\_ISSb'};
-                    M(:,1) = DistsR;
-                    M(:,2) = DistsIC;
-                    M(:,3) = DistsISC;
-                    M(:,4) = DistsISS;
-                    M(:,5) = DistsISCa_ISSa;
-                    M(:,6) = DistsISCb_ISSb;
-                    neuralM = [7.4958;    5.0244;    5.3185;    5.5513;    6.6415;   6.6724];          
-                    nn{ww,qq} = corr(mean(M)', neuralM,'Type',cortype);
+            elseif hum1_nrn2 == 2
+                groupnames = {'R','IC','ISC','ISS','ISCa\_ISSa','ISCb\_ISSb'};
+                N(:,1) = DistsR;
+                N(:,2) = DistsIC;
+                N(:,3) = DistsISC;
+                N(:,4) = DistsISS;
+                N(:,5) = DistsISCa_ISSa;
+                N(:,6) = DistsISCb_ISSb;
+                neuralN = [7.4958;    5.0244;    5.3185;    5.5513;    6.6415;   6.6724];          
+                nn{ww,qq} = corr(mean(N)', neuralN,'Type',cortype);
 
-                    %%%%%%%%%%%%%%%%%%corr conv1 with pixels%%%%%%%%%%%%%%%
-    %                W = load('pixel_mean_groups.mat');
-    %                pixelM = W.M;
-    %                 disp([ network '_' num2str(corr(mean(pixelM)',mean(M)'))]);
-    %                 break;
-                    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-                    SE = [];
-                    for i=1:length(groupnames)
-                        SE(i) = std(M(:,i))/sqrt(size(M,1)); 
-                        % standard errors of the mean. we have 8 pairs for each
-                        % group (R,IC,ISC,ISS). The SE is calculated for the
-                        % mean of each pair
-                    end
+                SE = [];
+                for i=1:length(groupnames)
+                    SE(i) = std(N(:,i))/sqrt(size(N,1)); 
+                    % standard errors of the mean. we have 8 pairs for each
+                    % group (R,IC,ISC,ISS). The SE is calculated for the
+                    % mean of each pair
+                end
 
                     if ~quantify
                         % barplots showing the dissimilarities for each of the
                         % groups.
-                        y = mean(M);
+                        y = mean(N);
                         x = 1:length(y);
 
                         subplot(dim1,dim1+1,qq);
                         h = plot(x,y,'.');
-                        axis([0.5,6.5,min(mean(M))-max(SE)*1.2,max(mean(M))+max(SE)*1.2]);
+                        axis([0.5,6.5,min(mean(N))-max(SE)*1.2,max(mean(N))+max(SE)*1.2]);
                         set(gca,'XTick',x, 'box', 'off');
                         title(layerchoice);
                         hold on
@@ -155,14 +146,13 @@ for hum1_nrn2 = 1:2             % human = 1, neural = 2
                             saveas(gcf,['/home/luna.kuleuven.be/u0107087/Desktop/' network '_neural.bmp'])
                         end
                     end
-                    clear M
-                end
-                if quantify; clear M; end
             end
-            fprintf('Time: %.2f seconds\n',toc);
+            if quantify; clear M N; end
         end
+        fprintf('Time: %.2f seconds\n',toc);
     end
 end
+
 
 % save(['FIG4_' choice '.mat'],'hh','nn','layer')
 if quantify
