@@ -60,8 +60,6 @@ else
     net = vl_simplenn_tidy(net);
     % Removing the cropping from preprocessing
     net.meta.normalization.border = [0 0];
-    % Reshaping the averageImage into 3D, to avoid eexrrors from subtraction
-    %net.meta.normalization.averageImage = reshape(net.meta.normalization.averageImage, [1 1 3]); %fixed this issue by saving the net files in the correct way
     layerNames = net.layers;
     for i=1:length(layerNames)
         layerCell{i} = layerNames{i}.name;
@@ -75,7 +73,7 @@ for i = 1:numel(stimulist)
     % load and preprocess an image
     im = imread(stimulist{i});
     im_ = single(im); % NOTE: 0-255 range
-    im_ = imresize(im_, net.meta.normalization.imageSize(1:2),'bilinear'); % Bilinear is optional
+    im_ = imresize(im_, net.meta.normalization.imageSize(1:2)); % try Bilinear or Nearest
     im_ = bsxfun(@minus, im_, net.meta.normalization.averageImage);
 % % TEST - DONT USE    im_ = single(mat2gray(im_));
     
