@@ -1,5 +1,5 @@
 clear;
-addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/
+addpath ./myFunctions/
 
 % SETTINGS
 quantify   = 0; % This will make a line plot for all layers instead of barplots for each (quantify=1 gives you the last figure from the paper)

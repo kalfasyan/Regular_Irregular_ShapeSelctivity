@@ -1,7 +1,7 @@
 clear;
 % This script will create the dissimilarity matrices for all layers of
 % a chosen deep neural network of our stimuli (regularIrregular)
-addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions
+addpath ./myFunctions
 
 stimchoice = 'regularIrregularSmall2x';%'regularIrregular';
 distType = 'euclidean';%'spearman';%

@@ -8,8 +8,8 @@ clear;
 % same, so there is high pixel similarity
 % 
 % addpath /data/local/software/Body_Patches/foos
-addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/
-addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/export_fig
+addpath ./myFunctions/
+addpath ./myFunctions/export_fig
 
 
 % Choosing the images to use
@@ -53,7 +53,7 @@ set(gca,'YTickLabel',[])
 color = get(gcf,'Color');
 set(gca,'XColor',color,'YColor',color,'TickDir','out')
 set(gca,'Visible','off')
-export_fig(['/media/yannis/HGST_4TB/Ubudirs/Figures_Regireg/' 'pixels.eps'])
+export_fig(['./Figures_Regireg/' 'pixels.eps'])
 
 
 %%
@@ -94,7 +94,7 @@ set(gca,'YTickLabel',[])
 color = get(gcf,'Color');
 set(gca,'XColor',color,'YColor',color,'TickDir','out')
 set(gca,'Visible','off')
-export_fig(['/media/yannis/HGST_4TB/Ubudirs/Figures_Regireg/' 'IT_neurons.eps'])
+export_fig(['./Figures_Regireg/' 'IT_neurons.eps'])
 
 
 disp(['PEARSON CORRELATION OF UPPER DIAGONALS: ', num2str(corr(pixels,spikes,'Type','Spearman'))])

@@ -1,6 +1,6 @@
 clear; 
-addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/
-addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/export_fig/
+addpath ./myFunctions/
+addpath ./myFunctions/export_fig/
 
 stimchoice = 'regularIrregular';%'regularIrregularSmall2x';%
 distType = 'euclidean'; % for neurons

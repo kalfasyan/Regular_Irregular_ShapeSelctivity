@@ -7,8 +7,8 @@ clear;
 % Can't use pinksearch stimuli since sometimes the pinknoise background is the
 % same, so there is high pixel similarity
 
-addpath /data/local/software/Body_Patches/foos
-addpath /data/local/myFunctions/
+% addpath /data/local/software/Body_Patches/foos
+addpath ./myFunctions/
 
 distType = 'euclidean';
 

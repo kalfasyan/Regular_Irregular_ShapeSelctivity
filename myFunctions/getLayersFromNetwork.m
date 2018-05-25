@@ -1,6 +1,4 @@
 function [ layers, layersizes ] = getLayersFromNetwork( network )
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
 
 % File contains cell arrays with alexnet/vgg16/vgg19 sizes and names of
 % layers in columns respectively

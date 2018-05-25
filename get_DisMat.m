@@ -1,6 +1,6 @@
 function [M] = get_DisMat(network, laychoice)
-addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/
-addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/export_fig
+addpath ./myFunctions/
+addpath ./myFunctions/export_fig
 
 stimchoice = 'regularIrregular';%'regularIrregularSmall2x';%
 distType = 'euclidean';
@@ -30,10 +30,10 @@ set(gca,'XColor',color,'YColor',color,'TickDir','out');
 set(gca,'Visible','off');
 
 % export_fig test.eps -native
-export_fig(['/media/yannis/HGST_4TB/Ubudirs/Figures_Regireg/' network '_' laychoice '.eps'])
+export_fig(['./Figures_Regireg/' network '_' laychoice '.eps'])
 close
-% saveas(gcf,['/media/yannis/HGST_4TB/Ubudirs/Figures_Regireg/' network '_' laychoice '.svg'])
+% saveas(gcf,['./Figures_Regireg/' network '_' laychoice '.svg'])
 end
 
 % M = get_DisMat('alexnet','fc8')
-% /media/yannis/HGST_4TB/Ubudirs/Figures_Regireg
+% ./Figures_Regireg

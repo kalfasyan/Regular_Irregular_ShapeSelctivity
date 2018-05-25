@@ -1,5 +1,5 @@
 clear;
-addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/
+addpath ./myFunctions/
 
 % SETTINGS
 cortype    = 'Pearson'; % to correlate means of barplots for each layer with mean of neural/human data
