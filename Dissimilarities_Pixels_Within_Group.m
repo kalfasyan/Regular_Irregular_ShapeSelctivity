@@ -1,5 +1,5 @@
 clear;
-addpath /data/local/myFunctions/
+addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/
 
 quantify   = 0;
 cortype    = 'Pearson';

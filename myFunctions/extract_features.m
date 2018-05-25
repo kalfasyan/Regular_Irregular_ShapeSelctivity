@@ -1,11 +1,11 @@
 function extract_features(imagepath,netFile)
 
-addpath /data/local/myFunctions
-modelPath = '/data/local/Conv_NN/models/';
+addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions
+modelPath = '/media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/models/';
 % setup MatConvNet
-run  /data/local/software/matconvnet-1.0-beta24/matlab/vl_setupnn
+run  /media/yannis/HGST_4TB/Ubudirs/matconvnet-1.0-beta24/matlab/vl_setupnn
 
-% All models are in /data/local/Conv_NN/models/
+% All models are in /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/models/
 switch netFile
     case 'net-alex-untrained.mat'
         network = 'untrained';
@@ -40,10 +40,10 @@ imgpathSplit = strsplit(imagepath,'/');
 if strcmp(imgpathSplit(end),''); imgpathSplit = imgpathSplit(end-1); else imgpathSplit = imgpathSplit(end);end
 imgpathSplit = imgpathSplit{1};
 
-if exist(['/data/local/Conv_NN/features/' network '_' imgpathSplit '/'],'dir') ~= 7
-    mkdir(['/data/local/Conv_NN/features/' network '_' imgpathSplit]);
+if exist(['/media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/features/' network '_' imgpathSplit '/'],'dir') ~= 7
+    mkdir(['/media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/features/' network '_' imgpathSplit]);
 else
-    if numel(dir(['/data/local/Conv_NN/features/' network '_' imgpathSplit '/']))-2 == numel(stimulist)
+    if numel(dir(['/media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/features/' network '_' imgpathSplit '/']))-2 == numel(stimulist)
         warning('Features have already been extracted. Check/Delete them and re-run.');
     end
 end
@@ -101,7 +101,7 @@ for i = 1:numel(stimulist)
     imgnameSplit = strsplit(stimulist{i},'/');
     imgnameSplit = imgnameSplit{end}(1:end-4);
     
-    save(['/data/local/Conv_NN/features/' network '_' imgpathSplit '/' imgnameSplit '.mat'], ... 
+    save(['/media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/features/' network '_' imgpathSplit '/' imgnameSplit '.mat'], ... 
             'feature');
 end
 clear stimulist feature res im im_

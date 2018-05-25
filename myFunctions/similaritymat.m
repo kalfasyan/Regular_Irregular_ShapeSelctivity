@@ -1,14 +1,14 @@
 function [D] = similaritymat(layerchoice,network,stimchoice,distType)
 % network = alexnet/vgg19
 tic;
-fprintf('Time for layer: %s \t', layerchoice);
-addpath /data/local/myFunctions/
+fprintf('Time for layer: %s \t %s \t', layerchoice, distType);
+addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/
 % getting a list with the extracted features for the preprocessed images
 % each image.mat file has the features (or activations of the network's
 % unit's) for each layer separately. We ignore the 'relu' layers, since
 % they are not layers, but just an activation function thresholding at 0.
 
-featdir = ['/data/local/Conv_NN/features/' network '_' stimchoice '/'];
+featdir = ['/media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/features/' network '_' stimchoice '/'];
 featList = natsort(getAllFiles(featdir));
 if strcmp(stimchoice,'regularIrregular') || strcmp(stimchoice,'regularIrregularSmall2x')
     featList = vertcat(featList(49:end), featList(1:48)); % moving Regular first

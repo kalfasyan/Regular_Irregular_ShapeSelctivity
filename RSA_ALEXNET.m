@@ -1,34 +1,30 @@
 clear; 
-addpath /data/local/myFunctions/
+addpath ./myFunctions/
+addpath ./myFunctions/export_fig/
 
-stimchoice = 'regularIrregular';%'regularIrregularSmall2x';%
-distType = 'euclidean';
+stimchoice = 'regularIrregular';%'regularIrregularSmall2x';
+distType = 'euclidean'; % for neurons
 normalize = 0;
 
 %% ALEXNET distance matrices (euclidean) for every layer
-network = 'alexnet';
+network = 'alexnet';%'untrained';% 
+stimchoice = 'regularIrregularSmall2x';
 layer = getLayersFromNetwork(network)';
-network = 'untrained';
 load([network '_D_' stimchoice '_' distType '.mat'])
-
 
 for i=1:numel(D)
     DEEPuptrUN(:,i) = getUpperDiagElements(D{i});
 end
-[coeff,score,latent,tsquared,explained,mu] = pca(D{end});
-untrained_fc8_expl = explained(1);
 clear network D
 
 % -------------------------------------------------------------
 
-network = 'alexnet';
+network = 'alexnet'; stimchoice = 'regularIrregular';
 load([network '_D_' stimchoice '_' distType '.mat'])
 
 for i=1:numel(D)
     DEEPuptrTR(:,i) = getUpperDiagElements(D{i});
 end
-[coeff,score,latent,tsquared,explained,mu] = pca(D{end});
-trained_fc8_expl = explained(1);
 clear network D
 
 
@@ -50,10 +46,20 @@ if normalize
 end
 
 REGIRREGspikes = REGIRREG;
-% Dreg = squareform(pdist(REGIRREG,'euclidean'));
+% Dreg = squareform(pdist(REGIRREG','euclidean'));
+% Dreg_no0 = Dreg(:); Dreg_no0(Dreg_no0==0) = [];
 % imagesc(Dreg)
+% caxis([min(Dreg_no0) max(Dreg_no0)]);
 % set(gca,'XTick',linspace(1,length(shapenames),length(shapenames)),'XTickLabel', shapenames,'XTickLabelRotation',90);
 % set(gca,'YTick',linspace(1,length(shapenames),length(shapenames)),'YTickLabel', shapenames);
+% set(gca,'XTick',[]);
+% set(gca,'XTickLabel',[]);
+% set(gca,'YTick',[]);
+% set(gca,'YTickLabel',[])
+% color = get(gcf,'Color');
+% set(gca,'XColor',color,'YColor',color,'TickDir','out');
+% set(gca,'Visible','off');
+% export_fig(['/media/yannis/HGST_4TB/Ubudirs/Figures_Regireg/neural_DisMat.eps'])
 
 %% Bootstrapping the number of neurons (i.e. the biological neurons)
 
@@ -67,9 +73,6 @@ parfor iter=1:iterations
     % Sampling from 119 neurons and making a distance matrix for 64 stimuli
     REGIRREGdist = squareform(pdist(REGIRREGspikes(smplREGIRREG,:)',distType));
     REGIRREGuptr = getUpperDiagElements(REGIRREGdist)';
-    
-%     [coeff,score,latent,tsquared,explained,mu] = pca(REGIRREGdist);
-%     prctExplained{iter} = explained;
 
     for lay=1:20 % FOR PARFOR USE THE EXACT NUMBER INSTEAD OF VARIABLE
         bootstrappedUN(iter,lay) = corr(REGIRREGuptr,DEEPuptrUN(:,lay),'Type',corType);
@@ -82,23 +85,23 @@ end
 
 % Trained vs untrained
 for lay = 1:length(layer)
-    tmp = bootstrappedTR(:,lay) - bootstrappedUN(:,lay);
+    tmp =  bootstrappedUN(:,lay) - bootstrappedTR(:,lay); %bootstrappedTR(:,lay) - bootstrappedUN(:,lay);
     pVals(lay) = prctile(tmp,5);
 end
 
 FDR = mafdr(pVals,'BHFDR',true);
 sigf = FDR>0.05;
 
-% First vs Everything
-for z = 1:length(layer)
-    tmp = bootstrappedTR(:,z) - bootstrappedTR(:,1);
-    p_values(z) = prctile(tmp,5);
-end
-FDR2 = mafdr(p_values,'BHFDR',true);
-sigf2 = FDR2>0.05;
-
-layer(sigf2)
-[m,i] = max(median(bootstrappedTR)); layer(i)
+% % First vs Everything
+% for z = 1:length(layer)
+%     tmp = bootstrappedTR(:,z) - bootstrappedTR(:,1);
+%     p_values(z) = prctile(tmp,5);
+% end
+% FDR2 = mafdr(p_values,'BHFDR',true);
+% sigf2 = FDR2>0.05;
+% 
+% layer(sigf2)
+% [m,i] = max(median(bootstrappedTR)); layer(i)
 
 %% Plotting
 % figure;
@@ -130,13 +133,12 @@ layer(sigf2)
 % plot(linspace(0.5,length(layer)-0.5,length(layer)), median(bootstrappedUN), 'r')
 % hold on
 % 
-% 
 % axis([0,length(layer),-0.2,1])
 % legend([h1 h2],'untrained','trained')
-% title(['Correlation type: ' corType ' -- Distance type: ' distType]);
+% title(['Correlation type: ' corType ' -- Distance type: ' distType ' -- Stimuli: ' stimchoice]);
 % set(gca,'XTick',linspace(0.5,length(layer)-0.5,length(layer)),'XTickLabel', layer,'XTickLabelRotation',90);
 % grid on
-
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure;
 q1 = prctile(bootstrappedTR,2.5); 
 q2 = prctile(bootstrappedTR,97.5);
@@ -147,8 +149,9 @@ plot(x,y,'r')
 hh = errorbar(x,y, q1-y,q2-y, 'o')
 set(gca,'XTick',linspace(0.5,length(layer)-0.5,length(layer)),'XTickLabel', layer,'XTickLabelRotation',90);
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % figure;
+
+% figure;
+hold on
 q1 = prctile(bootstrappedUN,2.5);
 q2 = prctile(bootstrappedUN,97.5);
 y = median(bootstrappedUN);
@@ -160,15 +163,16 @@ errorbar(x,y, q1-y,q2-y, 'o')
 set(gca,'XTick',linspace(0.5,length(layer)-0.5,length(layer)),'XTickLabel', layer,'XTickLabelRotation',90);
 title(distType)
 axis([0,length(layer),0.0,1])
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % % Significance stars
 tmp1 = linspace(0.5,length(layer)-0.5,length(layer));
-tmp2 = median(bootstrappedTR);
+tmp2 = median(bootstrappedUN);
 for i=1:length(layer)
     if sigf(i) > 0
         text(tmp1(i), tmp2(i),'*');
     end
-    if sigf2(i) > 0
-        text(tmp1(i), tmp2(i),'+');
-    end    
+%     if sigf2(i) > 0
+%         text(tmp1(i), tmp2(i),'+');
+%     end    
 end

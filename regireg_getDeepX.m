@@ -4,7 +4,7 @@ function [ X, featList ] = regireg_getDeepX( network, layerchoice, stimchoice )
 % columns corresponding to deep unit activations (deep artificial neurons)
 
 % Make a list of the stimuli file names
-featdir = ['/data/local/Conv_NN/features/' network '_' stimchoice '/'];
+featdir = ['/media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/features/' network '_' stimchoice '/'];
 featList = natsort(getAllFiles(featdir));
 featList = vertcat(featList(49:end), featList(1:48)); % moving Regular first like Kayaert's paper
 

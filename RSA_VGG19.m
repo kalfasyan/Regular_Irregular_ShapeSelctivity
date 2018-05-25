@@ -1,14 +1,15 @@
 clear; 
-addpath /data/local/myFunctions/
+addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/
+addpath /media/yannis/HGST_4TB/Ubudirs/Regular_Irregular_ShapeSelectivity-master/myFunctions/export_fig/
 
-stimchoice = 'regularIrregular';
+stimchoice = 'regularIrregular';%'regularIrregularSmall2x';%
 distType = 'euclidean'; % for neurons
 normalize = 0;
 
 %% VGG19 distance matrices (euclidean) for every layer
-network = 'vgg19';
+network = 'vgg19';  %'untrainedVGG';%
+stimchoice = 'regularIrregularSmall2x';
 layer = getLayersFromNetwork(network)';
-network = 'untrainedVGG';
 load([network '_D_' stimchoice '_' distType '.mat'])
 
 for i=1:numel(D)
@@ -18,7 +19,7 @@ clear network D
 
 % -------------------------------------------------------------
 
-network = 'vgg19';
+network = 'vgg19'; stimchoice = 'regularIrregular';
 load([network '_D_' stimchoice '_' distType '.mat'])
 
 for i=1:numel(D)
@@ -81,86 +82,87 @@ sigf = FDR>0.05;
 
 % First vs Everything
 for z = 1:length(layer)
-    tmp = bootstrappedTR(:,z) - bootstrappedTR(:,1);
+    tmp = bootstrappedTR(:,1) - bootstrappedTR(:,z);%bootstrappedTR(:,z) - bootstrappedTR(:,1);
     p_values(z) = prctile(tmp,5);
 end
-FDR2 = mafdr(p_values,'BHFDR',true);
-sigf2 = FDR2>0.05;
-
-layer(sigf2)
-[m,i] = max(median(bootstrappedTR)); layer(i)
-m
+% FDR2 = mafdr(p_values,'BHFDR',true);
+% sigf2 = FDR2>0.05;
+% 
+% layer(sigf2)
+% [m,i] = max(median(bootstrappedTR)); layer(i)
+% m
 
 %% Plotting
-figure;
-colorUN = 'r';
-colorTR = 'g';
-alpha = 0.3;
-q1 = prctile(bootstrappedUN,2.5); % ciA(1,:)
-q2 = prctile(bootstrappedUN,97.5); % ciA(2,:)
-
-x= 0.5:length(layer)-0.5;
-X=[x,fliplr(x)];                %#create continuous x value array for plotting
-Y=[q1,fliplr(q2)];              %#create y values for out and then back
-h1 = fill(X,Y,colorUN,'facealpha',alpha,'edgecolor','none');
-clear x X Y q1 q2
-hold on
-
-%     scatter([0.5:length(layer)-0.5],mean(bootstrappedM),'.k'); 
-%     hold on
-q1 = prctile(bootstrappedTR,2.5); % ciM(1,:);%
-q2 = prctile(bootstrappedTR,97.5); % ciM(2,:);%
-x= 0.5:length(layer)-0.5;
-X=[x,fliplr(x)];                %#create continuous x value array for plotting
-Y=[q1,fliplr(q2)];              %#create y values for out and then back
-h2 = fill(X,Y,colorTR,'facealpha',alpha,'edgecolor','none');
-hold on
-
-plot(linspace(0.5,length(layer)-0.5,length(layer)), median(bootstrappedTR), 'g')
-hold on
-plot(linspace(0.5,length(layer)-0.5,length(layer)), median(bootstrappedUN), 'r')
-hold on
-
-
-axis([0,length(layer),-0.2,1])
-legend([h1 h2],'untrained','trained')
-title(['Correlation type: ' corType ' -- Distance type: ' distType]);
-set(gca,'XTick',linspace(0.5,length(layer)-0.5,length(layer)),'XTickLabel', layer,'XTickLabelRotation',90);
-grid on
-
-% q1 = prctile(bootstrappedTR,2.5); % ciA(1,:)
-% q2 = prctile(bootstrappedTR,97.5);
-% y = median(bootstrappedTR);
-% x = linspace(0.5,length(layer)-0.5,length(layer));
-% 
 % figure;
-% plot(x,y,'r')
-% errorbar(x,y, q1-y,q2-y, 'o')
+% colorUN = 'r';
+% colorTR = 'g';
+% alpha = 0.3;
+% q1 = prctile(bootstrappedUN,2.5); % ciA(1,:)
+% q2 = prctile(bootstrappedUN,97.5); % ciA(2,:)
+% 
+% x= 0.5:length(layer)-0.5;
+% X=[x,fliplr(x)];                %#create continuous x value array for plotting
+% Y=[q1,fliplr(q2)];              %#create y values for out and then back
+% h1 = fill(X,Y,colorUN,'facealpha',alpha,'edgecolor','none');
+% clear x X Y q1 q2
+% hold on
+% 
+% %     scatter([0.5:length(layer)-0.5],mean(bootstrappedM),'.k'); 
+% %     hold on
+% q1 = prctile(bootstrappedTR,2.5); % ciM(1,:);%
+% q2 = prctile(bootstrappedTR,97.5); % ciM(2,:);%
+% x= 0.5:length(layer)-0.5;
+% X=[x,fliplr(x)];                %#create continuous x value array for plotting
+% Y=[q1,fliplr(q2)];              %#create y values for out and then back
+% h2 = fill(X,Y,colorTR,'facealpha',alpha,'edgecolor','none');
+% hold on
+% 
+% plot(linspace(0.5,length(layer)-0.5,length(layer)), median(bootstrappedTR), 'g')
+% hold on
+% plot(linspace(0.5,length(layer)-0.5,length(layer)), median(bootstrappedUN), 'r')
+% hold on
+% 
+% 
+% axis([0,length(layer),-0.2,1])
+% legend([h1 h2],'untrained','trained')
+% title(['Correlation type: ' corType ' -- Distance type: ' distType]);
 % set(gca,'XTick',linspace(0.5,length(layer)-0.5,length(layer)),'XTickLabel', layer,'XTickLabelRotation',90);
-% 
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% q1 = prctile(bootstrappedUN,2.5);
-% q2 = prctile(bootstrappedUN,97.5);
-% y = median(bootstrappedUN);
-% x = linspace(0.5,length(layer)-0.5,length(layer));
-% 
-% hold on;
-% plot(x,y,'r')
-% errorbar(x,y, q1-y,q2-y, 'o')
-% set(gca,'XTick',linspace(0.5,length(layer)-0.5,length(layer)),'XTickLabel', layer,'XTickLabelRotation',90);
-% title(distType)
-% axis([0,length(layer),0.0,1])
+% grid on
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure;
+q1 = prctile(bootstrappedTR,2.5); 
+q2 = prctile(bootstrappedTR,97.5);
+y = median(bootstrappedTR);
+x = linspace(0.5,length(layer)-0.5,length(layer));
+
+plot(x,y,'r')
+hh = errorbar(x,y, q1-y,q2-y, 'o')
+set(gca,'XTick',linspace(0.5,length(layer)-0.5,length(layer)),'XTickLabel', layer,'XTickLabelRotation',90);
+
+
+% figure;
+hold on
+q1 = prctile(bootstrappedUN,2.5);
+q2 = prctile(bootstrappedUN,97.5);
+y = median(bootstrappedUN);
+x = linspace(0.5,length(layer)-0.5,length(layer));
+
+hold on;
+plot(x,y,'r')
+errorbar(x,y, q1-y,q2-y, 'o')
+set(gca,'XTick',linspace(0.5,length(layer)-0.5,length(layer)),'XTickLabel', layer,'XTickLabelRotation',90);
+title(distType)
+axis([0,length(layer),0.0,1])
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Significance stars
 tmp1 = linspace(0.5,length(layer)-0.5,length(layer));
-tmp2 = median(bootstrappedTR);
+tmp2 = median(bootstrappedUN);
 for i=1:length(layer)
     if sigf(i) > 0
         text(tmp1(i), tmp2(i),'*');
     end
-    if sigf2(i) > 0
-        text(tmp1(i), tmp2(i),'+');
-    end    
+%     if sigf2(i) > 0
+%         text(tmp1(i), tmp2(i),'+');
+%     end    
 end

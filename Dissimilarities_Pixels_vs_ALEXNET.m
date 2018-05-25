@@ -36,9 +36,22 @@ end
 % Pixel dissimilarity matrix of stimuli_in1D
 pixeldissimilarity = squareform(pdist(stimuli_in1D,distType));
 pixels = getUpperDiagElements(pixeldissimilarity);
-figure; imagesc(pixeldissimilarity); title('Pixel dissimilarity Matrix');
-set(gca,'XTick',linspace(1,length(stimList),length(stimList)),'XTickLabel', stimNames,'XTickLabelRotation',90);
-set(gca,'YTick',linspace(1,length(stimList),length(stimList)),'YTickLabel', stimNames);
+ 
+Dreg_no0 = pixeldissimilarity(:); Dreg_no0(Dreg_no0==0) = [];
+figure; imagesc(pixeldissimilarity);
+caxis([min(Dreg_no0) max(Dreg_no0)]);
+set(gca,'XTick',[]);
+set(gca,'XTickLabel',[]);
+set(gca,'YTick',[]);
+set(gca,'YTickLabel',[])
+color = get(gcf,'Color');
+set(gca,'XColor',color,'YColor',color,'TickDir','out');
+set(gca,'Visible','off');
+export_fig(['/media/yannis/HGST_4TB/Ubudirs/Figures_Regireg/pixels_DisMat.eps'])
+
+% title('Pixel dissimilarity Matrix');
+% set(gca,'XTick',linspace(1,length(stimList),length(stimList)),'XTickLabel', stimNames,'XTickLabelRotation',90);
+% set(gca,'YTick',linspace(1,length(stimList),length(stimList)),'YTickLabel', stimNames);
 
 % ------------------------------------------
 % dissimilarity matrix of deepnet layers
