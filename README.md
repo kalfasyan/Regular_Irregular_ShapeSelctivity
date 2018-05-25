@@ -18,4 +18,8 @@ Same goes for the models used (/models/ directory inside repo).
 "untrainedVGG" refers to the untrained VGG19.
 The rest are self-explanatory.
 
-Better documentation to be added..
+### Distance matrices :
+They can be found in /distance_matrices/ , but bear in mind that the scripts that create them or use them, do that for the root directory of the repo. I put them in a separate folder for the sake of simpler repo structure and I will try to fix the paths used in the scripts later on.
+
+
+Thank you for the understanding. Better documentation to be added..
