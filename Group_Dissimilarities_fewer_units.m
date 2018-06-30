@@ -3,7 +3,7 @@ addpath ./myFunctions/
 
 % SETTINGS
 cortype    = 'Pearson'; % to correlate means of barplots for each layer with mean of neural/human data
-networks = {'vgg16'};%{'alexnet'};%,'vgg16','vgg19'};
+networks = {'vgg19'};%{'alexnet'};%,'vgg16','vgg19'};
 stimchoice = 'regularIrregular';
 iterations = 10000;
 sampl_percentages = [20/100, 10/100, 1/100, 0.1/100];

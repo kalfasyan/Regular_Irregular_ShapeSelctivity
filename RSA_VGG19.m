@@ -10,7 +10,7 @@ normalize = 0;
 network = 'vgg19';  %'untrainedVGG';%
 stimchoice = 'regularIrregularSmall2x';
 layer = getLayersFromNetwork(network)';
-load([network '_D_' stimchoice '_' distType '.mat'])
+load(['./distance_matrices/' network '_D_' stimchoice '_' distType '.mat'])
 
 for i=1:numel(D)
     DEEPuptrUN(:,i) = getUpperDiagElements(D{i});
@@ -20,7 +20,7 @@ clear network D
 % -------------------------------------------------------------
 
 network = 'vgg19'; stimchoice = 'regularIrregular';
-load([network '_D_' stimchoice '_' distType '.mat'])
+load(['./distance_matrices/' network '_D_' stimchoice '_' distType '.mat'])
 
 for i=1:numel(D)
     DEEPuptrTR(:,i) = getUpperDiagElements(D{i});
