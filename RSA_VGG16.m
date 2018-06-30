@@ -7,10 +7,12 @@ distType = 'euclidean'; % for neurons
 normalize = 0;
 
 %% VGG16 distance matrices (euclidean) for every layer
-network = 'vgg16';  %'untrainedvgg16';%
-stimchoice = 'regularIrregularSmall2x';
+network = 'untrainedvgg16';%'vgg16';  %
+stimchoice = 'regularIrregular'; %stimchoice = 'regularIrregularSmall2x';
 layer = getLayersFromNetwork(network)';
-load([network '_D_' stimchoice '_' distType '.mat'])
+
+dname = './distance_matrices/';
+load([dname network '_D_' stimchoice '_' distType '.mat'])
 
 for i=1:numel(D)
     DEEPuptrUN(:,i) = getUpperDiagElements(D{i});
@@ -20,7 +22,7 @@ clear network D
 % -------------------------------------------------------------
 
 network = 'vgg16'; stimchoice = 'regularIrregular';
-load([network '_D_' stimchoice '_' distType '.mat'])
+load([dname network '_D_' stimchoice '_' distType '.mat'])
 
 for i=1:numel(D)
     DEEPuptrTR(:,i) = getUpperDiagElements(D{i});
@@ -57,40 +59,55 @@ corType = 'Spearman';
 iterations = 10000;
 [bootstrappedTR, bootstrappedUN] = deal(zeros(iterations,length(layer)));
 
+n_lay = length(layer);
 parfor iter=1:iterations    
     smplREGIRREG = datasample(nrnsREGIRREG,length(nrnsREGIRREG),'Replace',true);
     % Sampling from 119 neurons and making a distance matrix for 64 stimuli
     REGIRREGdist = squareform(pdist(REGIRREGspikes(smplREGIRREG,:)',distType));
     REGIRREGuptr = getUpperDiagElements(REGIRREGdist)';
 
-    for lay=1:36 % FOR PARFOR USE THE EXACT NUMBER INSTEAD OF VARIABLE
+    for lay=1:n_lay % FOR PARFOR USE THE EXACT NUMBER INSTEAD OF VARIABLE
         bootstrappedUN(iter,lay) = corr(REGIRREGuptr,DEEPuptrUN(:,lay),'Type',corType);
         bootstrappedTR(iter,lay) = corr(REGIRREGuptr,DEEPuptrTR(:,lay),'Type',corType);
     end    
 
 end
 
+%% Noise ceiling
+n = size(REGIRREGspikes,1);
+ceilingNEUR = nan(iterations,1);
+tic
+for iter=1:iterations
+    % split neural sample randomly in half
+    I = randperm(n);
+    g1 = I( 1:floor(n/2) );
+    g2 = I( ceil(n/2):end );
+    
+    % calculate correlations between distance matrices for neural split
+    % samples
+    D1 = pdist(REGIRREGspikes(g1,:)',distType);
+    D2 = pdist(REGIRREGspikes(g2,:)',distType);
+    ceilingNEUR(iter) = corr(D1',D2','Type',corType);
+end
+toc
+% spearman-brown correction
+ceilingNEUR = (2*ceilingNEUR) ./ (1 + ceilingNEUR);
+
 %% Analysis of Significance
 
-for lay = 1:length(layer)
-    tmp = bootstrappedUN(:,lay) - bootstrappedTR(:,lay)%bootstrappedTR(:,lay) - bootstrappedUN(:,lay);
-    pVals(lay) = prctile(tmp,5);
-end
-
+% Trained vs untrained
+pVals = mean((bootstrappedTR - bootstrappedUN)<=0);
 FDR = mafdr(pVals,'BHFDR',true);
-sigf = FDR>0.05;
+sigf = FDR<0.05;
 
-% % First vs Everything
-% for z = 1:length(layer)
-%     tmp = bootstrappedTR(:,z) - bootstrappedTR(:,1);
-%     p_values(z) = prctile(tmp,5);
-% end
-% FDR2 = mafdr(p_values,'BHFDR',true);
-% sigf2 = FDR2>0.05;
-% 
-% layer(sigf2)
-% [m,i] = max(median(bootstrappedTR)); layer(i)
-% m
+% First vs Everything
+p_values = mean((bootstrappedTR - repmat(bootstrappedTR(:,1),[1,size(bootstrappedTR,2)]) )<=0);
+FDR2 = mafdr(p_values,'BHFDR',true);
+sigf2 = FDR2<0.05;
+
+layer(sigf2)
+[m,i] = max(median(bootstrappedTR)); layer(i)
+
 %% Plotting
 % figure;
 % colorUN = 'r';
@@ -134,8 +151,15 @@ q2 = prctile(bootstrappedTR,97.5);
 y = median(bootstrappedTR);
 x = linspace(0.5,length(layer)-0.5,length(layer));
 
-plot(x,y,'r')
-hh = errorbar(x,y, q1-y,q2-y, 'o')
+cci = prctile(ceilingNEUR,[2.5 97.5]);
+cmu = median(ceilingNEUR);
+
+hold on;
+fill( [0,n_lay,n_lay,0] , cci([1,1,2,2]), [1,1,1]*.9, 'edgecolor','none' )
+plot( [0,n_lay], [1,1]*cmu, '-k' )
+
+hh = errorbar(x,y, q1-y,q2-y, 'ob');
+
 set(gca,'XTick',linspace(0.5,length(layer)-0.5,length(layer)),'XTickLabel', layer,'XTickLabelRotation',90);
 
 
@@ -156,12 +180,12 @@ axis([0,length(layer),0.0,1])
 
 % % Significance stars
 tmp1 = linspace(0.5,length(layer)-0.5,length(layer));
-tmp2 = median(bootstrappedUN);
+tmp2 = median(bootstrappedTR);
 for i=1:length(layer)
     if sigf(i) > 0
-        text(tmp1(i), tmp2(i),'*');
+        plot(tmp1(i)-.4, tmp2(i),'*k');
     end
-%     if sigf2(i) > 0
-%         text(tmp1(i), tmp2(i),'+');
-%     end    
+    if sigf2(i) > 0
+        plot(tmp1(i)+.4, tmp2(i),'+k');
+    end    
 end
